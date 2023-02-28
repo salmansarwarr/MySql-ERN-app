@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require('cors');
 const dotenv = require("dotenv").config();
 const colors = require('colors');
 const goalsRouter = require("./routes/goals");
@@ -10,6 +11,8 @@ const port = process.env.PORT;
 connectDB();
 
 const app = express();
+
+app.use(cors())
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
