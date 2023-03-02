@@ -9,8 +9,6 @@ const { errorHandler } = require("./middleware/error");
 const connectDB = require("./config/db");
 const port = process.env.PORT || 5000;
 
-connectDB();
-
 const app = express();
 
 app.use(cors());
@@ -31,11 +29,13 @@ if (process.env.NODE_ENV === "production") {
         )
     );
 } else {
-    app.get('/', (req, res) => res.send('Please set to production'))
+    app.get("/", (req, res) => res.send("Please set to production"));
 }
 
 app.use(errorHandler);
 
-app.listen(port, () => {
-    console.log(`Server is listening on port ${port}`);
+connectDB().then(() => {
+    app.listen(port, () => {
+        console.log(`Server is listening on port ${port}`);
+    });
 });
