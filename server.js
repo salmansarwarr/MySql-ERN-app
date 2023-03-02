@@ -25,7 +25,7 @@ if (process.env.NODE_ENV === "production") {
 
     app.get("*", (req, res) =>
         res.sendFile(
-            path.join("./frontend/build/index.html"), (err) => {
+            path.resolve(__dirname, "./frontend/build/index.html"), (err) => {
                 res.status(500).send(err);
             }
         )
