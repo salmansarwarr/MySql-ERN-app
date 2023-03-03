@@ -7,7 +7,7 @@ const goalsRouter = require("./routes/goals");
 const usersRouter = require("./routes/user");
 const { errorHandler } = require("./middleware/error");
 const connectDB = require("./config/db");
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3000;
 
 const app = express();
 
