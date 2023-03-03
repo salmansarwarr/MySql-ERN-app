@@ -27,7 +27,7 @@ function GoalForm() {
                     />
                 </div>
                 <div className="form-group">
-                    <button className="btn btn-block" type="submit">
+                    <button className="btn btn-block" type="submit" disabled = {text.length === 0}>
                         Add Goal
                     </button>
                 </div>
