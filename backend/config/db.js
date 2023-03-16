@@ -1,15 +1,10 @@
-const mongoose = require('mongoose');
+const mysql2 = require('mysql2');
 
-// mongoose.set('strictQuery', true);
-
-const connectDB = async () => {
-    try {
-        const conn = await mongoose.connect(process.env.MONGO_URI);
-        console.log(`mongodb connected: ${conn.connection.host}`.cyan.underline);
-    } catch (error) {
-        console.log(error);    
-        process.exit(1);    
-    }
-}
+const connectDB = mysql2.createConnection({
+    host: 'localhost',
+    user: 'salman',
+    password: process.env.DB_PASSWORD,
+    database: 'goalsApp',
+});
 
 module.exports = connectDB;

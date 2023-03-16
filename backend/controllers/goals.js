@@ -1,13 +1,20 @@
-const asyncHandler = require("express-async-handler");
-const goalModel = require("../models/goalModel");
-const userModel = require("../models/userModel");
+const asyncHandler = require('express-async-handler');
+const db = require('../config/db');
+const connectDB = require('../config/db');
 
 // @desc: Get goals
 // @route: GET /api/goals
 // @access: Private
 const getGoals = asyncHandler(async (req, res) => {
-    const goals = await goalModel.find({ user: req.user.id });
-    res.status(200).json(goals);
+    const query1 = `SELECT * FROM goals WHERE user = ${req.user};`;
+    connectDB.query(query1, (err, result) => {
+        if (err) {
+            res.status(400);
+            throw new Error('Error in query1');
+        } else {
+            res.status(200).json(result);
+        }
+    }); 
 });
 
 // @desc: Set goals
@@ -15,14 +22,33 @@ const getGoals = asyncHandler(async (req, res) => {
 // @access: Private
 const setGoals = asyncHandler(async (req, res) => {
     if (!req.body.text) {
-        // return res.status(400).json({msg: "Please add a text field"})
-        throw new Error("Please add a text field");
+        throw new Error('Please add a text field');
     }
-    const goal = await goalModel.create({
-        text: req.body.text,
-        user: req.user.id,
+    const query1 = `INSERT INTO goals (user, text, createdAt, updatedAt) 
+        VALUES (
+            ${req.user},
+            '${req.body.text}',
+            CURRENT_TIME(),
+            CURRENT_TIME()
+        )`;
+    connectDB.query(query1, (err, result) => {
+        if (err) {
+            res.status(400);
+            throw new Error('Error in query2');
+        } else {
+            console.log('One goal inserted');
+        }
     });
-    res.status(200).json(goal);
+
+    const query2 = `SELECT * FROM goals WHERE user = ${req.user} ORDER BY _id DESC LIMIT 1;`;
+    connectDB.query(query2, (err, result) => {
+        if (err) {
+            res.status(400);
+            throw new Error('Error in query3');
+        } else {
+            res.status(200).json(result[0]);
+        }
+    });
 });
 
 // @desc: Update goals
@@ -30,29 +56,51 @@ const setGoals = asyncHandler(async (req, res) => {
 // @access: Private
 const updateGoals = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const goal = await goalModel.findById(id);
-    if (!goal) {
-        res.status(400);
-        throw new Error("Goal not found");
-    }
 
     // Check for user
     if (!req.user) {
         res.status(401);
-        throw new Error("User not found");
+        throw new Error('User not found');
     }
 
-    // Make sure the logged in user matches the goal user
-    if (goal.user.toString() !== req.user.id) {
-        res.status(401);
-        throw new Error("User not authorized");
-    }
-
-    const updatedGoal = await goalModel.findByIdAndUpdate(id, req.body, {
-        new: true,
+    // Check for goal and valid user
+    const query1 = `SELECT * FROM goals WHERE _id = ${id}`
+    connectDB.query(query1, (err, result) => {
+        if (err) {
+            res.status(400);
+            throw new Error('Error in query1');
+        } else {
+            if(result.length == 0) {
+                res.status(401);
+                throw new Error('Goal not found');
+            }
+            else if(result[0].user != req.user){
+                res.status(400);
+                throw new Error('User not authorized');
+            } 
+        }
     });
-    console.log(goal, updatedGoal);
-    res.status(200).json(updatedGoal);
+
+    const query2 = `UPDATE goals SET text = '${req.body.text}' WHERE _id = ${id} AND user = ${req.user};`
+    connectDB.query(query2, (err, result) => {
+        if (err) {
+            res.status(400);
+            throw new Error('Error in query2');
+        } else {
+            console.log(`One goal updated`);
+        }
+    });
+
+    const query3 = `SELECT * FROM goals WHERE user = ${req.user} AND _id = ${id};`;
+    connectDB.query(query3, (err, result) => {
+        if (err) {
+            res.status(400);
+            throw new Error('Error in query3');
+        } else {
+            console.log(result[0]);
+            res.status(200).json(result[0]);
+        }
+    });
 });
 
 // @desc: Delete goals
@@ -60,24 +108,41 @@ const updateGoals = asyncHandler(async (req, res) => {
 // @access: Private
 const deleteGoals = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const goal = await goalModel.findById(id);
-    if (!goal) {
-        res.status(400);
-        throw new Error("Goal not found");
-    }
 
     // Check for user
     if (!req.user) {
         res.status(401);
-        throw new Error("User not found");
+        throw new Error('User not found');
     }
 
-    // Make sure the logged in user matches the goal user
-    if (goal.user.toString() !== req.user.id) {
-        res.status(401);
-        throw new Error("User not authorized");
-    }
-    await goal.remove();
+    // Check for goal and valid user
+    const query1 = `SELECT * FROM goals WHERE _id = ${id}`
+    connectDB.query(query1, (err, result) => {
+        if (err) {
+            res.status(400);
+            throw new Error('Error in query1');
+        } else {
+            if(result.length == 0) {
+                res.status(401);
+                throw new Error('Goal not found');
+            }
+            else if(result[0].user != req.user){
+                res.status(400);
+                throw new Error('User not authorized');
+            } 
+        }
+    });
+
+    const query2 = `DELETE FROM goals WHERE _id = ${id};`;
+    connectDB.query(query2, (err, result) => {
+        if (err) {
+            res.status(400);
+            throw new Error('Error in query2');
+        } else {
+            console.log('One goal deleted');
+        }
+    });
+
     res.status(200).json({ id });
 });
 
