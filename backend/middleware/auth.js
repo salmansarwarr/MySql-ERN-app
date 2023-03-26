@@ -19,15 +19,15 @@ const protect = asyncHandler(async (req, res, next) => {
             // Get user from the token
             // req.user = await userModel.findById(decoded.id).select('-password');
             const query1 = `SELECT * FROM users WHERE _id = ${decoded.id}`;
+            console.log(`SELECT * FROM users WHERE _id = ${decoded.id}`);
             connectDB.query(query1, async (err, result) => {
                 if (err) {
                     res.status(400);
                     throw new Error('Error in query1');
-                } else if (result) {
+                } else if (result.length != 0) {
                     return result;
                 }
             });
-
             req.user = decoded.id;
             next();
         } catch (error) {
@@ -40,7 +40,6 @@ const protect = asyncHandler(async (req, res, next) => {
         res.status(401);
         throw new Error('Not authorized, no token');
     }
-
 });
 
 module.exports = { protect };

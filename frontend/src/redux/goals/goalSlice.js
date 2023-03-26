@@ -1,17 +1,17 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import goalService from "./goalService";
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import goalService from './goalService';
 
 const initialState = {
     goals: [],
     isError: false,
     isSuccess: false,
     isLoading: false,
-    message: "",
+    message: '',
 };
 
 //Create new goal
 export const createGoal = createAsyncThunk(
-    "goal/create",
+    'goal/create',
     async (goalData, thunkAPI) => {
         try {
             const token = thunkAPI.getState().auth.user.token;
@@ -30,7 +30,7 @@ export const createGoal = createAsyncThunk(
 
 // Delete goal
 export const deleteGoal = createAsyncThunk(
-    "goal/delete",
+    'goal/delete',
     async (id, thunkAPI) => {
         try {
             const token = thunkAPI.getState().auth.user.token;
@@ -49,11 +49,15 @@ export const deleteGoal = createAsyncThunk(
 
 // Update Goal
 export const updateGoal = createAsyncThunk(
-    "goal/update",
+    'goal/update',
     async (goalData, thunkAPI) => {
         try {
             const token = thunkAPI.getState().auth.user.token;
-            return await goalService.updateGoal(goalData.id, goalData.text, token);
+            return await goalService.updateGoal(
+                goalData.id,
+                goalData.text,
+                token
+            );
         } catch (error) {
             const message =
                 (error.response &&
@@ -68,7 +72,7 @@ export const updateGoal = createAsyncThunk(
 
 // Get user goals
 export const getGoals = createAsyncThunk(
-    "goals/getAll",
+    'goals/getAll',
     async (_, thunkAPI) => {
         try {
             const token = thunkAPI.getState().auth.user.token;
@@ -86,7 +90,7 @@ export const getGoals = createAsyncThunk(
 );
 
 export const goalSlice = createSlice({
-    name: "goals",
+    name: 'goals',
     initialState,
     reducers: {
         reset: (state) => initialState,
