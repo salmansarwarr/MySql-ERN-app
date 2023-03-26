@@ -3,10 +3,10 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv').config();
 const colors = require('colors');
-const goalsRouter = require('./routes/goals');
-const usersRouter = require('./routes/user');
-const { errorHandler } = require('./middleware/error');
-const connectDB = require('./config/db');
+const goalsRouter = require('./src/routes/goals');
+const usersRouter = require('./src/routes/user');
+const { errorHandler } = require('./src/middleware/error');
+const connectDB = require('./src/config/db');
 const port = process.env.PORT || 3000;
 
 const app = express();
